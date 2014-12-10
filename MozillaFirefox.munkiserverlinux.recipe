@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>Identifier</key>
-	<string>com.github.mkuron.munkiserver.firefox-en_US</string>
+	<string>com.github.ern-st.munkiserverlinux.firefox-en_US</string>
 	<key>Input</key>
 	<dict>
 		<key>NAME</key>
@@ -16,13 +16,24 @@
 	<key>Process</key>
 	<array>
 		<dict>
+			<key>Processor</key>
+            <string>MunkiInfoCreator</string>
+            <key>Arguments</key>
+            <dict>
+                <key>pkg_path</key>
+                <string>%pathname%</string>
+                <key>info_path</key>
+                <string>%RECIPE_CACHE_DIR%/%NAME%.plist</string>
+            </dict>
+        </dict>
+		<dict>
 			<key>Arguments</key>
 			<dict>
 				<key>pkg_path</key>
 				<string>%pathname%</string>
 			</dict>
 			<key>Processor</key>
-			<string>MunkiServerImporter</string>
+			<string>MunkiServerImporterLinux</string>
 		</dict>
 	</array>
 </dict>
