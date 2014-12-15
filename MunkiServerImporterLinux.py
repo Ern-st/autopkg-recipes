@@ -50,6 +50,11 @@ class MunkiServerImporterLinux(Processor):
 			"description": ("Dictionary of pkginfo keys to override in the "
 			"generated pkginfo."),
 		},
+		"additional_makepkginfo_options": {
+			"required": False,
+			"description": ("Array of additional command-line options that will "
+			"be inserted when calling 'makepkginfo'."),
+		},
 	}
 	output_variables = {
 		"edit_url" : {
@@ -74,6 +79,62 @@ class MunkiServerImporterLinux(Processor):
 		options += ['-c', self.cookiejar]
 		options += [url]
 		return subprocess.check_output(['/usr/bin/curl'] + options)
+
+	def create_munkipkginfo(self):
+		# Set pkginfo plist path
+		self.env["pkginfo_path"] = ("%s/%s.plist") % (self.env.get("RECIPE_CACHE_DIR"), self.env.get("NAME"))
+
+		# Generate arguments for makepkginfo.
+		args = ["/usr/local/munki/makepkginfo", self.env["pkg_path"]]
+		if self.env.get("munkiimport_pkgname"):
+			args.extend(["--pkgname", self.env["munkiimport_pkgname"]])
+		if self.env.get("munkiimport_appname"):
+			args.extend(["--appname", self.env["munkiimport_appname"]])
+		if self.env.get("additional_makepkginfo_options"):
+			args.extend(self.env["additional_makepkginfo_options"])
+		if self.env.get("munkiimport_name"):
+			args.extend(["--displayname", self.env["munkiimport_name"]])
+
+		# Call makepkginfo.
+		try:
+			proc = subprocess.Popen(
+				args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+			(out, err_out) = proc.communicate()
+		except OSError as err:
+			raise ProcessorError(
+				"makepkginfo execution failed with error code %d: %s"
+				% (err.errno, err.strerror))
+		if proc.returncode != 0:
+			raise ProcessorError(
+				"creating pkginfo for %s failed: %s"
+				% (self.env["pkg_path"], err_out))
+
+		# Get pkginfo from output plist.
+		pkginfo = FoundationPlist.readPlistFromString(out)
+
+		# copy any keys from pkginfo in self.env
+		if "pkginfo" in self.env:
+			for key in self.env["pkginfo"]:
+				pkginfo[key] = self.env["pkginfo"][key]
+
+		# set an alternate version_comparison_key
+		# if pkginfo has an installs item
+		if "installs" in pkginfo and self.env.get("version_comparison_key"):
+			for item in pkginfo["installs"]:
+				if not self.env["version_comparison_key"] in item:
+					raise ProcessorError(
+						("version_comparison_key '%s' could not be found in "
+						 "the installs item for path '%s'")
+						% (self.env["version_comparison_key"], item["path"]))
+				item["version_comparison_key"] = (
+					self.env["version_comparison_key"])
+
+		try:
+			pkginfo_path = self.env["pkginfo_path"]
+			FoundationPlist.writePlist(pkginfo, pkginfo_path)
+		except OSError, err:
+			raise ProcessorError("Could not write pkginfo %s: %s"
+								 % (pkginfo_path, err.strerror))        
 	
 	def munkiserver_login(self):
 		self.cookiejar = os.path.join(self.env['RECIPE_CACHE_DIR'], 'cookiejar')
@@ -113,7 +174,7 @@ class MunkiServerImporterLinux(Processor):
 	def munkiserver_upload_package(self):
 		data = {}
 		data['package_file'] = '@' + self.env["pkg_path"]
-		data['pkginfo_file'] = '@' + self.env["info_path"]
+		data['pkginfo_file'] = '@' + self.env["pkginfo_path"]
 		data['commit'] = 'Upload'
 		if 'munkiimport_pkgname' in self.env:
 			data['makepkginfo_options[pkgname]'] = self.env["munkiimport_pkgname"]
@@ -195,6 +256,7 @@ class MunkiServerImporterLinux(Processor):
 		if 'pkginfo' in self.env and 'name' in self.env["pkginfo"]:
 			raise ProcessorError('The name key must not be overridden in pkginfo. To override the name, set the munkiimport_name variable instead.')
 
+		self.create_munkipkginfo()
 		self.munkiserver_login()
 		if self.munkiserver_version_already_exists():
 			self.output('Item %s already exists at %s' % (self.env['NAME'], self.env['edit_url']))
