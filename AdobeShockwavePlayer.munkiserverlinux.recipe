@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Description</key>
+    <string>Downloads the latest AdobeShockwavePlayer disk image and imports into Munki.</string>
+    <key>Identifier</key>
+    <string>com.github.ern-st.munkiserverlinux.AdobeShockwavePlayer</string>
+    <key>Input</key>
+    <dict>
+        <key>NAME</key>
+        <string>AdobeShockwavePlayer</string>
+        <key>MUNKI_REPO_SUBDIR</key>
+        <string>apps/adobe</string>
+    </dict>
+    <key>MinimumVersion</key>
+    <string>0.2.0</string>
+    <key>ParentRecipe</key>
+    <string>com.github.jleggat.autopkg-recipes.AdobeShockwavePlayer.download</string>
+    <key>Process</key>
+    <array>
+        <dict>
+            <key>Arguments</key>
+            <dict>
+                <key>flat_pkg_path</key>
+                <string>%pathname%/*.pkg</string>
+                <key>destination_path</key>
+                <string>%RECIPE_CACHE_DIR%/%NAME%</string>
+                <key>purge_destination</key>
+                <true/>
+            </dict>
+            <key>Processor</key>
+            <string>FlatPkgUnpacker</string>
+        </dict>
+         <dict>
+            <key>Processor</key>
+            <string>AdobeShockwaveVersioner</string>
+            <key>Arguments</key>
+            <dict>
+                <key>input_file_path</key>
+                <string>%RECIPE_CACHE_DIR%/%NAME%/Distribution</string>
+            </dict>
+        </dict>
+        <dict>
+			<key>Arguments</key>
+            <dict>
+                <key>pkg_path</key>
+                <string>%pathname%</string>
+                <key>pkginfo</key>
+                <dict>
+                    <key>name</key>
+                    <string>%NAME%</string>
+                    <key>version</key>
+                    <string>%version%</string>
+                    <key>catalogs</key>
+                    <array>
+                        <string>testing</string>
+                    </array>
+                    <key>description</key>
+                    <string>Adobe Shockwave Player Plugin for Web Browsers</string>
+                    <key>display_name</key>
+                    <string>Adobe Shockwave Player</string>
+                    <key>name</key>
+                    <string>%NAME%</string>
+                    <key>unattended_install</key>
+                    <true/>
+                    <key>category</key>
+                    <string>Browser Plugin</string>
+                    <key>developer</key>
+                    <string>Adobe</string>
+                </dict>
+                <key>repo_subdirectory</key>
+                <string>%MUNKI_REPO_SUBDIR%</string>
+            </dict>
+            <key>Processor</key>
+            <string>MunkiServerImporterLinux</string>
+        </dict>
+    </array>
+</dict>
+</plist>
