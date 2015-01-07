@@ -74,7 +74,6 @@ class MunkiServerImporterLinux(Processor):
 			else:
 				options.append('-F')
 			options.append('%s=%s' % (k, data[k]))
-
 		
 		options += ['-s']
 		options += ['-b', self.cookiejar]
@@ -213,45 +212,6 @@ class MunkiServerImporterLinux(Processor):
 		
 		return True
 	
-	def munkiserver_edit_package(self):
-		if not 'pkginfo' in self.env or len(self.env['pkginfo']) == 0:
-			return
-			
-		# request the edit form
-		url = self.env['edit_url']
-		resp = self.curl(url)
-		if resp.find('Munki Server: edit') <= 0:
-			raise ProcessorError('Do not have permission to edit packages in MunkiServer')
-		# extract the CSRF token
-		xml = ElementTree.fromstring(resp)
-		ct = xml.find(".//{http://www.w3.org/1999/xhtml}meta[@name='csrf-token']")
-		options = ['-H', 'X-CSRF-Token: ' + ct.attrib['content']]
-		
-		# compose the list
-		data = {}
-		for key in self.env["pkginfo"]:
-			if key == 'receipts' or key == 'installs' or key == 'raw_tags':
-				key += '_plist'
-			if hasattr(self.env['pkginfo'][key], "__len__") and not hasattr(self.env['pkginfo'][key], "endswith"):
-				# it's a non-scalar type but not a string, so it's a plist
-				value = FoundationPlist.writePlistToString(self.env['pkginfo'][key])
-			else:
-				value = self.env['pkginfo'][key]
-			data["package[%s]" % key] = value
-		
-		# change the parameter
-		options += ['-X', 'PUT']
-		url = url[:-5]
-		resp = self.curl(url, options, data)
-		# check for error
-		xml = ElementTree.fromstring(resp)
-		for msg in xml.findall(".//{http://www.w3.org/1999/xhtml}div[@class='message error']"):
-			raise ProcessorError(msg.text)
-		
-		# get the redirect URL
-		if 'version' in self.env["pkginfo"] or 'name' in self.env["pkginfo"]:
-			self.env['edit_url'] = re.match('.*You are being.*(http.*)".*redirected.*',resp).group(1)
-	
 	def main(self):
 		if not (self.env["pkg_path"].endswith('.dmg') or self.env["pkg_path"].endswith('.pkg')):
 			raise ProcessorError("Only DMGs and PKGs are accepted by MunkiServer.")
@@ -264,4 +224,4 @@ class MunkiServerImporterLinux(Processor):
 		if not self.munkiserver_upload_package():
 			self.output('Item %s already exists' % (self.env['NAME']))
 			return
-		self.munkiserver_edit_package()
+		self.output(self.env['edit_url'])
