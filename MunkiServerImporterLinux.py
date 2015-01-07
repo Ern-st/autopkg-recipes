@@ -67,7 +67,9 @@ class MunkiServerImporterLinux(Processor):
 	def curl(self, url, opt = [], data = {}):
 		options = opt[:]
 		for k in data:
-			if data[k].startswith('<'): # send the < literally, don't load a file from a path
+			if type(data[k]) is bool:
+				options.append('-F')
+			elif data[k].startswith('<'): # send the < literally, don't load a file from a path
 				options.append('--form-string')
 			else:
 				options.append('-F')
