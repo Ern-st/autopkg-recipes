@@ -30,7 +30,7 @@ Set MAJOR_VERSION to "10" to get the latest/last version of Adobe Reader 10 inst
                 <string>%MAJOR_VERSION%</string>
             </dict>
             <key>Processor</key>
-            <string>AdobeReaderURLProvider</string>
+            <string>com.github.autopkg.AdobeReaderURLProvider</string>
         </dict>
         <dict>
             <key>Arguments</key>
