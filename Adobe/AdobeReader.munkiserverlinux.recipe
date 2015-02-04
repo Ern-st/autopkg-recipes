@@ -55,7 +55,7 @@ exit 0
     <key>MinimumVersion</key>
     <string>0.2.0</string>
     <key>ParentRecipe</key>
-    <string>com.github.ern-st.downloaddk.AdobeReader</string>
+    <string>com.github.ern-st.downloadda.AdobeReader</string>
     <key>Process</key>
     <array>
         <dict>
