@@ -35,7 +35,7 @@ rm -f /Library/LaunchDaemons/com.adobe.fpsaud.plist</string>
 				</dict>
 			</dict>
 			<key>Processor</key>
-			<string>MunkiServerImporterLinux</string>
+			<string>com.github.ern-st.munkiserverlinux.MSIL/MunkiServerImporterLinux</string>
 		</dict>
 	</array>
 </dict>
