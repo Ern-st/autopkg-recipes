@@ -9,14 +9,14 @@
 	<key>Input</key>
 	<dict>
 		<key>NAME</key>
-		<string>Alfred3/string>
+		<string>Alfred_3/string>
 		<key>MUNKI_REPO_SUBDIR</key>
 		<string>apps/Alfred</string>
 		<key>pkginfo</key>
 		<dict>
 			<key>blocking_applications</key>
 			<array>
-				<string>Alfred 3</string>
+				<string>Alfred_3</string>
 				<string>Alfred Preferences</string>
 			</array>
 			<key>catalogs</key>
