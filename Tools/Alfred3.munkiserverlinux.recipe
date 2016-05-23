@@ -9,7 +9,7 @@
 	<key>Input</key>
 	<dict>
 		<key>NAME</key>
-		<string>Alfred_3/string>
+		<string>Alfred_3</string>
 		<key>MUNKI_REPO_SUBDIR</key>
 		<string>apps/Alfred</string>
 		<key>pkginfo</key>
