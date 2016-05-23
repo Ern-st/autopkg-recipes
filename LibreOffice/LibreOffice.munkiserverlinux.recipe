@@ -45,7 +45,7 @@
 				<string>%MUNKI_REPO_SUBDIR%</string>
 			</dict>
 			<key>Processor</key>
-			<string>MunkiServerImporterLinux</string>
+			<string>com.github.ern-st.munkiserverlinux.MSIL/MunkiServerImporterLinux</string>
 		</dict>
 	</array>
 </dict>

@@ -38,7 +38,7 @@
 	<array>
 		<dict>
 			<key>Processor</key>
-			<string>VirtualBoxURLProvider</string>
+			<string>com.github.jessepeterson.munki.VirtualBox/VirtualBoxURLProvider</string>
 		</dict>
 		<dict>
 			<key>Processor</key>
@@ -76,7 +76,7 @@
 					<key>installcheck_script</key>
 					<string>#!/bin/sh
 
-VBM=/usr/bin/VBoxManage
+VBM=/usr/local/bin/VBoxManage
 
 if [ ! -f $VBM ]
 then
@@ -91,7 +91,7 @@ $VBM list extpacks | /usr/bin/grep -A 1 &apos;Oracle VM VirtualBox Extension Pac
 
 if [ $? -ne 0 ]
 then
-	echo &quot;No Extesnion Pack found in output of $VBM list extpacks&quot;
+	echo &quot;No Extension Pack found in output of $VBM list extpacks&quot;
 
 	rm -f &quot;$extpackoutput&quot;
 	exit 0
@@ -112,7 +112,7 @@ exit 1</string>
 					<key>postinstall_script</key>
 					<string>#!/bin/sh
 
-VBM=/usr/bin/VBoxManage
+VBM=/usr/local/bin/VBoxManage
 
 if [ ! -f $VBM ]
 then
